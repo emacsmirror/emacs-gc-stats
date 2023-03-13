@@ -134,6 +134,15 @@ Otherwise, collect symbol."
             (cdr emacs-gc-stats--data))
       (prin1 previous-sessions (current-buffer)))))
 
+(defun emacs-gc-stats-clear ()
+  "Clear GC stats collected so far."
+  (interactive)
+  (setq emacs-gc-stats--data nil)
+  ;; Restart.
+  (when emacs-gc-stats-mode
+    (emacs-gc-stats-mode -1)
+    (emacs-gc-stats-mode +1)))
+
 (define-minor-mode emacs-gc-stats-mode
   "Toggle collecting Emacs GC statistics."
   :global t
