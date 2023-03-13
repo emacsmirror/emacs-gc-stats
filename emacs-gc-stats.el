@@ -98,7 +98,7 @@ Otherwise, collect symbol."
   (push
    (apply #'emacs-gc-stats--collect
           "Initial stats"
-          :time (current-time-string)
+          (current-time-string)
           emacs-gc-stats--setting-vars)
    emacs-gc-stats--data))
 
@@ -106,7 +106,7 @@ Otherwise, collect symbol."
   "Collect single GC stats."
   (push
    (apply #'emacs-gc-stats--collect
-          :time (current-time-string)
+          (current-time-string)
           emacs-gc-stats--command-vars)
    emacs-gc-stats--data))
 
@@ -115,7 +115,7 @@ Otherwise, collect symbol."
   (push
    (apply #'emacs-gc-stats--collect
           "Session end stats"
-          :time (current-time-string)
+          (current-time-string)
           emacs-gc-stats--summary-vars)
    emacs-gc-stats--data))
 
