@@ -131,11 +131,16 @@ Otherwise, collect symbol."
          (and (file-readable-p emacs-gc-stats-file)
               (with-temp-buffer
                 (insert-file-contents emacs-gc-stats-file)
-                (ignore-errors (read (current-buffer)))))))
+                (ignore-errors (read (current-buffer))))))
+        (session (reverse emacs-gc-stats--data)))
+    ;; remove end data in case if we continue recording.
+    (pop emacs-gc-stats--data)
     (with-temp-file emacs-gc-stats-file
       ;; Override partially saved session.
-      (setf (alist-get (car emacs-gc-stats--data) previous-sessions)
-            (cdr emacs-gc-stats--data))
+      (let ((existing (assoc (car session) previous-sessions)))
+        (if existing
+            (setcdr (cdr existing) (cdr session))
+          (push session previous-sessions)))
       (prin1 previous-sessions (current-buffer)))))
 
 (defun emacs-gc-stats-clear ()
