@@ -53,6 +53,9 @@
     gc-cons-percentage
     memory-limit
     emacs-version
+    doom-version
+    spacemacs-version
+    prelude-tips
     memory-info)
   "List of variable/function symbols to collect.")
 
