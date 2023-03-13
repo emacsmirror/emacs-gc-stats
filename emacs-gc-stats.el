@@ -30,7 +30,11 @@
 ;; to your init file to enable the statistics acquiring.
 ;;
 ;; When you are ready to share the results, run
-;; M-x emacs-gc-stats-submit
+;; M-x emacs-gc-stats-save-session
+;; and then share the saved `emacs-gc-stats-file'.
+;;
+;; You can use `emacs-gc-stats-clear' to clear the currently collected
+;; session data.
 
 ;; 
 ;;; Code:
