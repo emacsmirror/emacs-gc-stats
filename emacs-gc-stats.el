@@ -114,6 +114,15 @@ Otherwise, collect symbol."
           emacs-gc-stats--command-vars)
    emacs-gc-stats--data))
 
+(defun emacs-gc-stats--collect-init-end ()
+  "Collect init.el stats."
+  (push
+   (apply #'emacs-gc-stats--collect
+          "Init.el stats"
+          (current-time-string)
+          emacs-gc-stats--summary-vars)
+   emacs-gc-stats--data))
+
 (defun emacs-gc-stats--collect-end ()
   "Collect initial stats."
   (push
@@ -160,8 +169,10 @@ Otherwise, collect symbol."
         (unless emacs-gc-stats--data
           (emacs-gc-stats--collect-init))
         (add-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
+        (add-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
         (add-hook 'kill-emacs-hook #'emacs-gc-stats-save-session))
     (remove-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
+    (remove-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
     (remove-hook 'kill-emacs-hook #'emacs-gc-stats-save-session)))
 
 (provide 'emacs-gc-stats)
