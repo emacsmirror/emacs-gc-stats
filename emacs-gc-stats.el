@@ -52,7 +52,8 @@
   '(gc-cons-threshold
     gc-cons-percentage
     memory-limit
-    emacs-version)
+    emacs-version
+    memory-info)
   "List of variable/function symbols to collect.")
 
 (defvar emacs-gc-stats--command-vars
@@ -62,8 +63,7 @@
     gc-elapsed
     gcs-done
     this-command
-    memory-limit
-    memory-info)
+    memory-limit)
   "List of variable/function symbols to collect for each GC or command.")
 
 (defvar emacs-gc-stats--summary-vars
