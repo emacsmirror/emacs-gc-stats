@@ -56,7 +56,8 @@
     doom-version
     spacemacs-version
     prelude-tips
-    memory-info)
+    (memory-info)
+    (memory-use-counts))
   "List of variable/function symbols to collect.")
 
 (defvar emacs-gc-stats--command-vars
@@ -66,7 +67,9 @@
     gc-elapsed
     gcs-done
     this-command
-    memory-limit)
+    memory-limit
+    (memory-info)
+    (memory-use-counts))
   "List of variable/function symbols to collect for each GC or command.")
 
 (defvar emacs-gc-stats--summary-vars
@@ -75,7 +78,9 @@
     gc-elapsed
     gcs-done
     memory-limit
-    emacs-uptime)
+    (memory-info)
+    emacs-uptime
+    (memory-use-counts))
   "List of variables to collect at session end.")
 
 (defun emacs-gc-stats--collect (&rest symbols)
