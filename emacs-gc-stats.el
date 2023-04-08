@@ -69,7 +69,8 @@
     this-command
     memory-limit
     (memory-info)
-    (memory-use-counts))
+    (memory-use-counts)
+    emacs-gc-stats--idle-tic)
   "List of variable/function symbols to collect for each GC or command.")
 
 (defvar emacs-gc-stats--summary-vars
@@ -80,7 +81,9 @@
     memory-limit
     (memory-info)
     emacs-uptime
-    (memory-use-counts))
+    (memory-use-counts)
+    emacs-gc-stats-idle-delay
+    emacs-gc-stats--idle-tic)
   "List of variables to collect at session end.")
 
 (defun emacs-gc-stats--collect (&rest symbols)
@@ -169,6 +172,19 @@ Otherwise, collect symbol."
     (emacs-gc-stats-mode -1)
     (emacs-gc-stats-mode +1)))
 
+(defvar emacs-gc-stats-idle-delay 300
+  "Delay in seconds to count idle time.")
+
+(defvar emacs-gc-stats--idle-tic 0
+  "Idle counter.")
+(defvar emacs-gc-stats--idle-timer nil
+  "Time counting idle time.")
+(defun emacs-gc-stats-idle-tic ()
+  "Increase idle counter."
+  (when (and (current-idle-time)
+             (> (time-to-seconds (current-idle-time)) emacs-gc-stats-idle-delay))
+    (cl-incf emacs-gc-stats--idle-tic)))
+
 (define-minor-mode emacs-gc-stats-mode
   "Toggle collecting Emacs GC statistics."
   :global t
@@ -176,9 +192,17 @@ Otherwise, collect symbol."
       (progn
         (unless emacs-gc-stats--data
           (emacs-gc-stats--collect-init))
+        ;; 5 minutes counter.
+        (setq emacs-gc-stats--idle-time
+              (run-with-timer
+               emacs-gc-stats-idle-delay
+               emacs-gc-stats-idle-delay
+               #'emacs-gc-stats-idle-tic))
         (add-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
         (add-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
         (add-hook 'kill-emacs-hook #'emacs-gc-stats-save-session))
+    (when (timerp emacs-gc-stats--idle-time)
+      (cancel-timer emacs-gc-stats--idle-time))
     (remove-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
     (remove-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
     (remove-hook 'kill-emacs-hook #'emacs-gc-stats-save-session)))
