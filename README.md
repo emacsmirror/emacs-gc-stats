@@ -1,6 +1,8 @@
 This package collects Emacs garbage statistics over time and saves it
 in the format that can be shared with Emacs maintainers.
 
+See the source code for information how to contact the author.
+
 **Usage:**
 
 Add
