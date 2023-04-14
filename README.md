@@ -7,7 +7,7 @@ Add
 
 ``` lisp
 (require 'emacs-gc-stats)
-# optional
+;; optional
 (setq gc-cons-threshold
       (* 800000 (seq-random-elt '(1 2 4 8 16 32 64 128))))
 (emacs-gc-stats-mode +1)
