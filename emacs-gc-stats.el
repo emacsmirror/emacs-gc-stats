@@ -3,6 +3,10 @@
 ;; Copyright (C) 2023  Ihor Radchenko
 
 ;; Author: Ihor Radchenko <yantar92@posteo.net>
+;; URL: https://git.sr.ht/~yantar92/emacs-gc-stats
+;; Package-Requires: ((emacs "25.1"))
+
+;; Version: 1.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -185,6 +189,7 @@ Otherwise, collect symbol."
              (> (time-to-seconds (current-idle-time)) emacs-gc-stats-idle-delay))
     (cl-incf emacs-gc-stats--idle-tic)))
 
+;;;###autoload
 (define-minor-mode emacs-gc-stats-mode
   "Toggle collecting Emacs GC statistics."
   :global t
