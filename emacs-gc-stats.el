@@ -1,6 +1,6 @@
 ;;; emacs-gc-stats.el --- Collect Emacs GC statistics  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2023  Ihor Radchenko
+;; Copyright (C) 2023 Free Software Foundation, Inc.
 
 ;; Author: Ihor Radchenko <yantar92@posteo.net>
 ;; Maintainer: Ihor Radchenko <yantar92@posteo.net>
