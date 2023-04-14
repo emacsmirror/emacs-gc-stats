@@ -3,6 +3,7 @@
 ;; Copyright (C) 2023  Ihor Radchenko
 
 ;; Author: Ihor Radchenko <yantar92@posteo.net>
+;; Maintainer: Ihor Radchenko <yantar92@posteo.net>
 ;; URL: https://git.sr.ht/~yantar92/emacs-gc-stats
 ;; Package-Requires: ((emacs "25.1"))
 
