@@ -193,7 +193,7 @@ Otherwise, collect symbol."
         (unless emacs-gc-stats--data
           (emacs-gc-stats--collect-init))
         ;; 5 minutes counter.
-        (setq emacs-gc-stats--idle-time
+        (setq emacs-gc-stats--idle-timer
               (run-with-timer
                emacs-gc-stats-idle-delay
                emacs-gc-stats-idle-delay
@@ -201,8 +201,8 @@ Otherwise, collect symbol."
         (add-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
         (add-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
         (add-hook 'kill-emacs-hook #'emacs-gc-stats-save-session))
-    (when (timerp emacs-gc-stats--idle-time)
-      (cancel-timer emacs-gc-stats--idle-time))
+    (when (timerp emacs-gc-stats--idle-timer)
+      (cancel-timer emacs-gc-stats--idle-timer))
     (remove-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
     (remove-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
     (remove-hook 'kill-emacs-hook #'emacs-gc-stats-save-session)))
