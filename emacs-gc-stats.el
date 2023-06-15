@@ -53,6 +53,12 @@
   "File used to store the statistics across Emacs sessions."
   :type 'file)
 
+(defcustom emacs-gc-stats-gc-defaults nil
+  "GC strategy to be active in `emacs-gc-stats-mode'."
+  :type '(choice
+	  (const :tag "Do not change existing GC settings" nil)
+          (const :tag "Force emacs defaults" emacs-defaults)))
+
 (defvar emacs-gc-stats--setting-vars
   '(gc-cons-threshold
     gc-cons-percentage
@@ -190,12 +196,33 @@ Otherwise, collect symbol."
              (> (time-to-seconds (current-idle-time)) emacs-gc-stats-idle-delay))
     (cl-incf emacs-gc-stats--idle-tic)))
 
+(defvar emacs-gc-stats--gc-old nil
+  "Alist of variable symbols and values storing original GC settings.")
+
+(defun emacs-gc-stats--set-gc-defaults (&optional restore)
+  "Set GC settings according to `emacs-gc-stats-gc-defaults'.
+Revert original settings when RESTORE is non-nil."
+  (if restore
+      (dolist (pair emacs-gc-stats--gc-old)
+	(set (car pair) (cdr pair)))
+    (dolist (var '(gc-cons-threshold gc-cons-percentage))
+      (push (cons (symbol-name var) (symbol-value var))
+	    emacs-gc-stats--gc-old))
+    (pcase emacs-gc-stats-gc-defaults
+      (`nil nil)
+      (`emacs-defaults
+       (setq gc-cons-threshold 800000
+	     gc-cons-percentage 0.1))
+      (other (error "Unknown value of `emacs-gc-stats-gc-defaults': %S" other)))))
+
 ;;;###autoload
 (define-minor-mode emacs-gc-stats-mode
   "Toggle collecting Emacs GC statistics."
   :global t
   (if emacs-gc-stats-mode
       (progn
+	(emacs-gc-stats--set-gc-defaults)
+        (add-hook 'after-init-hook #'emacs-gc-stats--set-gc-defaults)
         (unless emacs-gc-stats--data
           (emacs-gc-stats--collect-init))
         ;; 5 minutes counter.
@@ -207,6 +234,8 @@ Otherwise, collect symbol."
         (add-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
         (add-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
         (add-hook 'kill-emacs-hook #'emacs-gc-stats-save-session))
+    (remove-hook 'after-init-hook #'emacs-gc-stats--set-gc-defaults)
+    (emacs-gc-stats--set-gc-defaults 'restore)
     (when (timerp emacs-gc-stats--idle-timer)
       (cancel-timer emacs-gc-stats--idle-timer))
     (remove-hook 'post-gc-hook #'emacs-gc-stats--collect-gc)
