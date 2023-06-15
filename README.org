@@ -12,9 +12,7 @@ See the source code for information how to contact the author.
 Add
 #+begin_src emacs-lisp
 (require 'emacs-gc-stats)
-;; optional
-(setq gc-cons-threshold
-      (* 800000 (seq-random-elt '(1 2 4 8 16 32 64 128))))
+(setq emacs-gc-stats-gc-defaults 'emacs-defaults) ; optional
 (emacs-gc-stats-mode +1)
 #+end_src
 to your init file to enable the statistics acquiring.
