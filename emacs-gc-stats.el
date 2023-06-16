@@ -163,7 +163,18 @@ Otherwise, collect symbol."
               (with-temp-buffer
                 (insert-file-contents emacs-gc-stats-file)
                 (ignore-errors (read (current-buffer))))))
-        (session (reverse emacs-gc-stats--data)))
+        (session (reverse emacs-gc-stats--data))
+        (write-region-inhibit-fsync t)
+        ;; We set UTF-8 here to avoid the overhead from
+        ;; `find-auto-coding'.
+        (coding-system-for-write 'utf-8)
+        print-level
+        print-length
+        print-quoted
+        (print-escape-control-characters t)
+        (print-escape-nonascii t)
+        (print-continuous-numbering t)
+        print-number-table)
     ;; remove end data in case if we continue recording.
     (pop emacs-gc-stats--data)
     (with-temp-file emacs-gc-stats-file
