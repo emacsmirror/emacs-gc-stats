@@ -183,7 +183,8 @@ Otherwise, collect symbol."
         (if existing
             (setcdr (cdr existing) (cdr session))
           (push session previous-sessions)))
-      (prin1 previous-sessions (current-buffer)))))
+      (prin1 previous-sessions (current-buffer)))
+    (message "GC stats saved to \"%s\".  You can share the file by sending email to emacs-gc-stats@gnu.org" emacs-gc-stats-file)))
 
 (defun emacs-gc-stats-clear ()
   "Clear GC stats collected so far."
