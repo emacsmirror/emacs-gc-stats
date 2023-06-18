@@ -27,3 +27,13 @@ and then share the saved `emacs-gc-stats-file` (defaults to
 You can use `M-x emacs-gc-stats-clear` to clear the currently collected
 session data.
 
+The following data is being collected after every command:
+
+-   GC settings `gc-cons-threshold` and `gc-cons-percentage`
+-   Emacs version and whether Emacs framework (Doom, Prelude, etc) is used
+-   Whether `gcmh-mode` is used
+-   Idle time and Emacs uptime
+-   Available OS memory (see `memory-info`)
+-   Emacs memory allocation/GC stats
+-   Current command
+
