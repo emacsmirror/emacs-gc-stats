@@ -5,6 +5,10 @@ This package collects Emacs garbage collection (GC) statistics over
 time and saves it in the format that can be shared with Emacs
 maintainers.
 
+Context:
+- https://yhetil.org/emacs-devel/20230310110747.4hytasakomvdyf7i@Ergus/
+- https://yhetil.org/emacs-devel/87v8j6t3i9.fsf@localhost/
+
 See the source code for information how to contact the author.
 
 *Usage:*
