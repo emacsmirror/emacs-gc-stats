@@ -54,7 +54,9 @@
   :type 'file)
 
 (defcustom emacs-gc-stats-gc-defaults nil
-  "GC strategy to be active in `emacs-gc-stats-mode'."
+  "GC strategy to be active in `emacs-gc-stats-mode'.
+This setting, when non-nil, will override the existing values of
+`gc-cons-threshold' and `gc-cons-percentage'."
   :type '(choice
 	  (const :tag "Do not change existing GC settings" nil)
           (const :tag "Force emacs defaults" emacs-defaults)))
