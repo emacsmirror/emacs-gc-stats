@@ -61,7 +61,7 @@ This setting, when non-nil, will override the existing values of
 	  (const :tag "Do not change existing GC settings" nil)
           (const :tag "Force emacs defaults" emacs-defaults)))
 
-(defvar emacs-gc-stats--setting-vars
+(defcustom emacs-gc-stats-setting-vars
   '(gc-cons-threshold
     gc-cons-percentage
     memory-limit
@@ -71,9 +71,11 @@ This setting, when non-nil, will override the existing values of
     prelude-tips
     (memory-info)
     (memory-use-counts))
-  "List of variable/function symbols to collect.")
+  "List of variable/function symbols to collect after loading init.el."
+  :type '(list sexp)
+  :package-version '(emacs-gc-stats . 1.3))
 
-(defvar emacs-gc-stats--command-vars
+(defcustom emacs-gc-stats-command-vars
   '(gc-cons-threshold
     gc-cons-percentage
     gcmh-mode
@@ -84,9 +86,11 @@ This setting, when non-nil, will override the existing values of
     (memory-info)
     (memory-use-counts)
     emacs-gc-stats--idle-tic)
-  "List of variable/function symbols to collect for each GC or command.")
+  "List of variable/function symbols to collect for each GC or command."
+  :type '(list sexp)
+  :package-version '(emacs-gc-stats . 1.3))
 
-(defvar emacs-gc-stats--summary-vars
+(defcustom emacs-gc-stats-summary-vars
   '(gc-cons-threshold
     gc-cons-percentage
     gc-elapsed
@@ -97,7 +101,9 @@ This setting, when non-nil, will override the existing values of
     (memory-use-counts)
     emacs-gc-stats-idle-delay
     emacs-gc-stats--idle-tic)
-  "List of variables to collect at session end.")
+  "List of variables to collect at session end."
+  :type '(list sexp)
+  :package-version '(emacs-gc-stats . 1.3))
 
 (defun emacs-gc-stats--collect (&rest symbols)
   "Collect SYMBOLS values.
@@ -127,7 +133,7 @@ Otherwise, collect symbol."
    (apply #'emacs-gc-stats--collect
           "Initial stats"
           (current-time-string)
-          emacs-gc-stats--setting-vars)
+          emacs-gc-stats-setting-vars)
    emacs-gc-stats--data))
 
 (defun emacs-gc-stats--collect-gc ()
@@ -135,7 +141,7 @@ Otherwise, collect symbol."
   (push
    (apply #'emacs-gc-stats--collect
           (current-time-string)
-          emacs-gc-stats--command-vars)
+          emacs-gc-stats-command-vars)
    emacs-gc-stats--data))
 
 (defun emacs-gc-stats--collect-init-end ()
@@ -144,7 +150,7 @@ Otherwise, collect symbol."
    (apply #'emacs-gc-stats--collect
           "Init.el stats"
           (current-time-string)
-          emacs-gc-stats--summary-vars)
+          emacs-gc-stats-summary-vars)
    emacs-gc-stats--data))
 
 (defun emacs-gc-stats--collect-end ()
@@ -153,7 +159,7 @@ Otherwise, collect symbol."
    (apply #'emacs-gc-stats--collect
           "Session end stats"
           (current-time-string)
-          emacs-gc-stats--summary-vars)
+          emacs-gc-stats-summary-vars)
    emacs-gc-stats--data))
 
 (defun emacs-gc-stats-save-session ()
