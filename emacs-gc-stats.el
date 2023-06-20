@@ -213,7 +213,8 @@ Otherwise, collect symbol."
   "Delay in seconds to count idle time.")
 
 (defvar emacs-gc-stats--idle-tic 0
-  "Idle counter.")
+  "Idle counter.
+Idle time is counted with `emacs-gc-stats-idle-delay' granularity.")
 (defvar emacs-gc-stats--idle-timer nil
   "Time counting idle time.")
 (defun emacs-gc-stats-idle-tic ()
