@@ -193,7 +193,7 @@ Otherwise, collect symbol."
           (push session previous-sessions)))
       (prin1 previous-sessions (current-buffer)))
     (when
-	(and (called-interactively-p)
+	(and (called-interactively-p 'interactive)
 	     (yes-or-no-p
 	      (format "GC stats saved to \"%s\".  Send email to emacs-gc-stats@gnu.org? " emacs-gc-stats-file)))
       (browse-url "mailto:emacs-gc-stats@gnu.org"))
