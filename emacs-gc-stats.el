@@ -199,6 +199,7 @@ Otherwise, collect symbol."
       (browse-url "mailto:emacs-gc-stats@gnu.org"))
     (message "GC stats saved to \"%s\".  You can share the file by sending email to emacs-gc-stats@gnu.org" emacs-gc-stats-file)))
 
+(defvar emacs-gc-stats-mode) ; defined later
 (defun emacs-gc-stats-clear ()
   "Clear GC stats collected so far."
   (interactive)
