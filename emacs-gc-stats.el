@@ -66,6 +66,16 @@ This setting, when non-nil, will override the existing values of
   :type 'boolean
   :package-version '(emacs-gc-stats . 1.3))
 
+(defcustom emacs-gc-stats-remind nil
+  "When non-nil, remind about submitting the data to Emacs devs.
+The value is wither nil (do not remind), t (remind in 3 weeks), or a
+number of days."
+  :type '(choice
+	  (const :tag "No reminder" nil)
+          (const :tag "Remind in 3 weeks" t)
+          (integer :tag "Remind after N days"))
+  :package-version '(emacs-gc-stats . 1.3))
+
 (defcustom emacs-gc-stats-setting-vars
   '(gc-cons-threshold
     gc-cons-percentage
@@ -170,15 +180,18 @@ Otherwise, collect symbol."
           emacs-gc-stats-summary-vars)
    emacs-gc-stats--data))
 
+(defun emacs-gc-stats--get-repvious-session-data ()
+  "Return previously saved session data."
+  (and (file-readable-p emacs-gc-stats-file)
+       (with-temp-buffer
+         (insert-file-contents emacs-gc-stats-file)
+         (ignore-errors (read (current-buffer))))))
+
 (defun emacs-gc-stats-save-session ()
   "Save stats to disk."
   (interactive)
   (emacs-gc-stats--collect-end)
-  (let ((previous-sessions
-         (and (file-readable-p emacs-gc-stats-file)
-              (with-temp-buffer
-                (insert-file-contents emacs-gc-stats-file)
-                (ignore-errors (read (current-buffer))))))
+  (let ((previous-sessions (emacs-gc-stats--get-repvious-session-data))
         (session (reverse emacs-gc-stats--data))
         (write-region-inhibit-fsync t)
         ;; We set UTF-8 here to avoid the overhead from
@@ -250,6 +263,35 @@ Revert original settings when RESTORE is non-nil."
 	     gc-cons-percentage 0.1))
       (other (error "Unknown value of `emacs-gc-stats-gc-defaults': %S" other)))))
 
+(defun emacs-gc-stats--remind-maybe ()
+  "Show a reminder according to `emacs-gc-stats-remind'."
+  (require 'notifications)
+  (when emacs-gc-stats-remind
+    (when-let* ((days-threshold (if (numberp emacs-gc-stats-remind)
+				    emacs-gc-stats-remind 21))
+		(first-session (or (car (last (emacs-gc-stats--get-repvious-session-data)))
+				   (reverse emacs-gc-stats--data)))
+		(first-record (car first-session))
+                (first-date-string
+                 (if (equal "Initial stats" (car first-record))
+                     (cadr first-record) (car first-record)))
+                (first-time (parse-time-string first-date-string))
+                (days-passed (time-to-number-of-days
+			      (time-subtract (current-time)
+					     (encode-time first-time)))))
+      (when (> days-passed days-threshold)
+        (notifications-notify
+         :title "emacs-gc-stats reminder"
+         :body
+         (format
+          "%.1f days have passed since first record.
+Consider M-x emacs-gc-stats-save-session or reporting back to emacs-gc-stats@gnu.org"
+	  days-passed))
+        (warn
+         "emacs-gc-stats: %.1f days have passed since first record.
+Consider M-x emacs-gc-stats-save-session or reporting back to emacs-gc-stats@gnu.org"
+	 days-passed)))))
+
 ;;;###autoload
 (define-minor-mode emacs-gc-stats-mode
   "Toggle collecting Emacs GC statistics."
@@ -258,6 +300,8 @@ Revert original settings when RESTORE is non-nil."
       (progn
 	(emacs-gc-stats--set-gc-defaults)
         (add-hook 'after-init-hook #'emacs-gc-stats--set-gc-defaults)
+        (add-hook 'after-init-hook #'emacs-gc-stats--remind-maybe)
+        (add-hook 'kill-emacs-hook #'emacs-gc-stats--remind-maybe)
         (unless emacs-gc-stats--data
           (emacs-gc-stats--collect-init))
         ;; 5 minutes counter.
@@ -270,6 +314,8 @@ Revert original settings when RESTORE is non-nil."
         (add-hook 'after-init-hook #'emacs-gc-stats--collect-init-end)
         (add-hook 'kill-emacs-hook #'emacs-gc-stats-save-session))
     (remove-hook 'after-init-hook #'emacs-gc-stats--set-gc-defaults)
+    (remove-hook 'after-init-hook #'emacs-gc-stats--remind-maybe)
+    (remove-hook 'kill-emacs-hook #'emacs-gc-stats--remind-maybe)
     (emacs-gc-stats--set-gc-defaults 'restore)
     (when (timerp emacs-gc-stats--idle-timer)
       (cancel-timer emacs-gc-stats--idle-timer))
