@@ -61,6 +61,11 @@ This setting, when non-nil, will override the existing values of
 	  (const :tag "Do not change existing GC settings" nil)
           (const :tag "Force emacs defaults" emacs-defaults)))
 
+(defcustom emacs-gc-stats-inhibit-command-name-logging nil
+  "When non-nil, do not collect command names (`this-command')."
+  :type 'boolean
+  :package-version '(emacs-gc-stats . 1.3))
+
 (defcustom emacs-gc-stats-setting-vars
   '(gc-cons-threshold
     gc-cons-percentage
@@ -116,7 +121,10 @@ Otherwise, collect symbol."
       (pcase var
         ((pred keywordp) (push var data))
         ((and (pred symbolp) (pred boundp))
-         (push (cons var (symbol-value var)) data))
+         (unless (and emacs-gc-stats-inhibit-command-name-logging
+		      (memq var '( this-command real-this-command
+				   last-command real-last-command)))
+           (push (cons var (symbol-value var)) data)))
         ((pred functionp)
          (push (cons var (funcall var)) data))
         ((pred listp)
