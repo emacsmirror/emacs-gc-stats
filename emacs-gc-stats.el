@@ -44,6 +44,8 @@
 ;; 
 ;;; Code:
 
+(require 'dired-aux)
+
 (defgroup emacs-gc-stats nil
   "Collect and share Emacs GC statistics."
   :tag "GC stats"
@@ -180,12 +182,33 @@ Otherwise, collect symbol."
           emacs-gc-stats-summary-vars)
    emacs-gc-stats--data))
 
+(defun emacs-gc-stats--compress ()
+  "Compress `emacs-gc-stats-file' and return non-nil on success."
+  (when (file-readable-p emacs-gc-stats-file)
+    (ignore-errors ; If compression failed, just leave it be.
+      ;; Confirm overwrite.
+      (cl-letf (((symbol-function 'y-or-n-p) (lambda (&rest _) t)))
+	(dired-compress-file emacs-gc-stats-file)))))
+
+(defun emacs-gc-stats--uncompress ()
+  "Uncompress `emacs-gc-stats-file' and return non-nil on success."
+  (let ((compressed
+	 (concat emacs-gc-stats-file
+		 (or dired-compress-file-default-suffix ".gz"))))
+    (when (file-readable-p compressed)
+      ;; Extract archive.
+      (dired-compress-file compressed))))
+
 (defun emacs-gc-stats--get-repvious-session-data ()
   "Return previously saved session data."
-  (and (file-readable-p emacs-gc-stats-file)
-       (with-temp-buffer
-         (insert-file-contents emacs-gc-stats-file)
-         (ignore-errors (read (current-buffer))))))
+  (and (or (file-readable-p emacs-gc-stats-file)
+	   (emacs-gc-stats--uncompress))
+       (unwind-protect
+	   (with-temp-buffer
+             (insert-file-contents emacs-gc-stats-file)
+             (ignore-errors (read (current-buffer))))
+         (emacs-gc-stats--compress)
+         nil)))
 
 (defun emacs-gc-stats-save-session ()
   "Save stats to disk."
@@ -213,12 +236,15 @@ Otherwise, collect symbol."
             (setcdr (cdr existing) (cdr session))
           (push session previous-sessions)))
       (prin1 previous-sessions (current-buffer)))
-    (when
-	(and (called-interactively-p 'interactive)
-	     (yes-or-no-p
-	      (format "GC stats saved to \"%s\".  Send email to emacs-gc-stats@gnu.org? " emacs-gc-stats-file)))
-      (browse-url "mailto:emacs-gc-stats@gnu.org"))
-    (message "GC stats saved to \"%s\".  You can share the file by sending email to emacs-gc-stats@gnu.org" emacs-gc-stats-file)))
+    ;; Attempt to compress the file.
+    (let ((emacs-gc-stats-file
+	   (or (emacs-gc-stats--compress)
+               emacs-gc-stats-file)))
+      (if (and (called-interactively-p 'interactive)
+	       (yes-or-no-p
+		(format "GC stats saved to \"%s\".  Send email to emacs-gc-stats@gnu.org? " emacs-gc-stats-file)))
+	  (browse-url "mailto:emacs-gc-stats@gnu.org")
+	(message "GC stats saved to \"%s\".  You can share the file by sending email to emacs-gc-stats@gnu.org" emacs-gc-stats-file)))))
 
 (defvar emacs-gc-stats-mode) ; defined later
 (defun emacs-gc-stats-clear ()
