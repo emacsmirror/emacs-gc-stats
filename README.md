@@ -71,6 +71,11 @@ You can pause the logging any time by disabling `emacs-gc-stats-mode`
 # News
 
 
+## Version 1.4
+
+-   `emacs-gc-stats-file` is now compressed, when possible.
+
+
 ## Version 1.3
 
 -   New customization: `emacs-gc-stats-inhibit-command-name-logging` to
