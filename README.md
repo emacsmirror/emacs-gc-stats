@@ -71,7 +71,7 @@ You can pause the logging any time by disabling `emacs-gc-stats-mode`
 # News
 
 
-## Version 1.4.1 (not yet released)
+## Version 1.4.1
 
 -   Avoid `memory-info` trying to retrieve memory information from remote
     system over TRAMP.
