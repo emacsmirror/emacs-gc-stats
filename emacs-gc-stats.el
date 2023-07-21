@@ -86,7 +86,8 @@ number of days."
     doom-version
     spacemacs-version
     prelude-tips
-    (memory-info)
+    ;; Only on this system.  Do not try fetching remote system info via TRAMP.
+    (let ((default-directory user-emacs-directory)) (memory-info))
     (memory-use-counts))
   "List of variable/function symbols to collect after loading init.el."
   :type '(list sexp)
@@ -100,7 +101,8 @@ number of days."
     gcs-done
     this-command
     memory-limit
-    (memory-info)
+    ;; Only on this system.  Do not try fetching remote system info via TRAMP.
+    (let ((default-directory user-emacs-directory)) (memory-info))
     (memory-use-counts)
     emacs-gc-stats--idle-tic)
   "List of variable/function symbols to collect for each GC or command."
@@ -113,7 +115,8 @@ number of days."
     gc-elapsed
     gcs-done
     memory-limit
-    (memory-info)
+    ;; Only on this system.  Do not try fetching remote system info via TRAMP.
+    (let ((default-directory user-emacs-directory)) (memory-info))
     emacs-uptime
     (memory-use-counts)
     emacs-gc-stats-idle-delay
